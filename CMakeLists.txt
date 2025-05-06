@@ -7,5 +7,8 @@ project(fman)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Add the executable
-add_executable(fman src/main.cpp)
+# Include the include directory
+include_directories(include)
+
+# Add the executable with additional source files
+add_executable(fman src/main.cpp src/core/File.cpp)
