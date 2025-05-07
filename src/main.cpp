@@ -5,10 +5,17 @@
  * @date 2025-05-06
  */
 
-#include <iostream>
-
+ #include "core/Directory.hpp"
+ #include <iostream>
+ 
 int main()
 {
-    std::cout << "Terminal File Manager démarre correctement !" << std::endl;
+    core::Directory dir(".");
+
+    std::cout << "📁 Contenu du répertoire courant :\n";
+    for (const auto& name : dir.listFiles()) {
+        std::cout << " - " << name << '\n';
+    }
+
     return 0;
 }

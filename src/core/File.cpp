@@ -8,9 +8,8 @@
 #include "core/File.hpp"
 #include <chrono>
 
-namespace fman::core {
+namespace core {
 
-    // Constructor for the File class
     File::File(const std::filesystem::directory_entry& entry)
         : _name(entry.path().filename().string()),
           _path(entry.path().string()),
@@ -25,28 +24,23 @@ namespace fman::core {
         _lastModified = std::chrono::system_clock::to_time_t(systemTime);
     }
 
-    // Getter for the file name
-    const std::string& File::name() const noexcept { 
+    const std::string& File::getName() const noexcept { 
         return _name; 
     }
 
-    // Getter for the file path
-    const std::string& File::path() const noexcept { 
+    const std::string& File::getPath() const noexcept { 
         return _path; 
     }
 
-    // Getter for the file size
-    std::uintmax_t File::size() const noexcept { 
+    std::uintmax_t File::getSize() const noexcept { 
         return _size; 
     }
 
-    // Check if the file is a directory
-    bool File::isDirectory() const noexcept { 
+    bool File::getIsDirectory() const noexcept { 
         return _isDirectory; 
     }
 
-    // Getter for the last modified time
-    std::time_t File::lastModified() const noexcept { 
+    std::time_t File::getLastModified() const noexcept { 
         return _lastModified; 
     }
 

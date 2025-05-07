@@ -1,14 +1,22 @@
-cmake_minimum_required(VERSION 3.10)
-
-# Set the project name
+cmake_minimum_required(VERSION 3.16)
 project(fman)
 
-# Specify the C++ standard
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Include the include directory
+# Enable colored diagnostic output if using Clang or GCC
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    add_compile_options(-Wall -Wextra -pedantic -fdiagnostics-color=always)
+endif()
+
+# Sources
+file(GLOB_RECURSE SOURCES
+    src/*.cpp
+)
+
+# Include dirs
 include_directories(include)
 
-# Add the executable with additional source files
-add_executable(fman src/main.cpp src/core/File.cpp)
+# Executable
+add_executable(fman ${SOURCES})
