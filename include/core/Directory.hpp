@@ -14,22 +14,26 @@
 
 namespace core {
 
+    /**
+     * @class Directory
+     * @brief A class that represents a directory and provides methods for managing it.
+     *
+     * This class allows you to check if a directory exists, create or remove it,
+     * list files within the directory, and refresh the file list.
+     */
+
     class Directory {
     public:
-        // Constructor / Destructor
         explicit Directory(const std::string& path);
         ~Directory() = default;
 
-        // Directory management
         bool exists() const noexcept;
         bool create() const noexcept;
         bool remove() const noexcept;
 
-        // File operations
         std::vector<std::string> listFiles() const noexcept;
         void refresh(); // rescans directory and updates _files
 
-        // Getters / Setters
         const std::string& getPath() const noexcept;
         void setPath(const std::string& path);
 

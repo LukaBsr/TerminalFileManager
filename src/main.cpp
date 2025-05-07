@@ -5,17 +5,14 @@
  * @date 2025-05-06
  */
 
- #include "core/Directory.hpp"
- #include <iostream>
- 
+#include "core/Directory.hpp"
+#include "ui/NcursesApp.hpp"
+
 int main()
 {
     core::Directory dir(".");
+    ui::NcursesApp app;
 
-    std::cout << "📁 Contenu du répertoire courant :\n";
-    for (const auto& name : dir.listFiles()) {
-        std::cout << " - " << name << '\n';
-    }
-
+    app.run();
     return 0;
 }
