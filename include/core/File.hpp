@@ -3,21 +3,27 @@
  * @brief Declaration of the core::File class that encapsulates file metadata
  */
 
- #ifndef FILE_HPP
+#ifndef FILE_HPP
     #define FILE_HPP
-    
+
     #include <string>
     #include <filesystem>
- 
- namespace core {
- 
+
+namespace core {
+
+    /**
+     * @class File
+     * @brief A class that represents a file and provides methods to access its metadata.
+     *
+     * This class encapsulates the metadata of a file, including its name, path,
+     * size, type (file or directory), and last modified time.
+     */
+
     class File {
     public:
-        // Constructor / Destructor
         explicit File(const std::filesystem::directory_entry& entry);
         ~File() = default;
 
-        // Getters
         const std::string& getName() const noexcept;
         const std::string& getPath() const noexcept;
         std::uintmax_t getSize() const noexcept;

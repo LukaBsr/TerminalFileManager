@@ -11,8 +11,13 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
 endif()
 
 # Sources
-file(GLOB_RECURSE SOURCES
-    src/*.cpp
+set(SOURCES
+    src/main.cpp
+    src/core/File.cpp
+    src/core/Directory.cpp
+    src/ui/NcursesManager.cpp
+    src/ui/NcursesWrapper.cpp
+    src/ui/NcursesApp.cpp
 )
 
 # Include dirs
@@ -20,3 +25,11 @@ include_directories(include)
 
 # Executable
 add_executable(fman ${SOURCES})
+
+# Link libraries
+find_package(Curses REQUIRED)
+if (Curses_FOUND)
+    target_link_libraries(fman ${CURSES_LIBRARIES})
+else()
+    message(FATAL_ERROR "Curses library not found")
+endif()
