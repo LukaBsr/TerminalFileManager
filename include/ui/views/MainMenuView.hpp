@@ -1,3 +1,8 @@
+/**
+ * @file MainMenuView.cpp
+ * @brief Declaration of the ui::MainMenuView class that provides functionality for the main menu view.
+ */
+
 #ifndef MAINMENUVIEW_HPP
     #define MAINMENUVIEW_HPP
 
@@ -11,6 +16,12 @@
 
 namespace ui {
 
+    /**
+     * @class MainMenuView
+     * @brief A class that represents the main menu view in the application.
+     *
+     * This class provides methods for handling user input and updating the main menu view.
+     */
     class MainMenuView : public IView {
     public:
         MainMenuView(NcursesManager& manager, std::function<void(ViewType)> switchCallback);
