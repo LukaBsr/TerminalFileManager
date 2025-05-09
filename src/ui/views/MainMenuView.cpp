@@ -9,11 +9,22 @@
 
 namespace ui {
 
+    /**
+     * @brief Constructor for the MainMenuView class.
+     * Initializes the manager and switch callback.
+     * @param manager The NcursesManager instance to manage the UI.
+     * @param switchCallback The callback function to switch views.
+     */
     MainMenuView::MainMenuView(NcursesManager& manager, std::function<void(ViewType)> switchCallback)
         : _manager(manager), _switchCallback(switchCallback), _selectedIndex(0) {
         _options = { "Explorer", "Afficher Info Fichier", "Quitter" };
     }
 
+    /**
+     * @brief Handles user input for the MainMenuView.
+     * Processes the input character and performs actions based on it.
+     * @param ch The input character.
+     */
     void MainMenuView::handleInput(int ch) {
         switch (ch) {
             case KEY_UP:
@@ -39,6 +50,10 @@ namespace ui {
         }
     }
 
+    /**
+     * @brief Updates the MainMenuView.
+     * Clears the window, draws the text, and refreshes the UI.
+     */
     void MainMenuView::update() {
         _manager.clearWindow(0);
         _manager.drawText(0, 1, 2, "[MENU PRINCIPAL]");
