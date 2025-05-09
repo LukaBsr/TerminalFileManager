@@ -6,8 +6,16 @@
 #ifndef NCURSESAPP_HPP
     #define NCURSESAPP_HPP
 
-    #include "NcursesManager.hpp"
+    #include "ui/NcursesManager.hpp"
+    #include "views/ViewType.hpp"
+    #include "views/IView.hpp"
+    #include "views/MainMenuView.hpp"
+    #include "views/ExplorerView.hpp"
+    #include "views/FileInfoView.hpp"
+
+    #include <memory>
     #include <functional>
+    #include <vector>
 
 namespace ui {
 
@@ -39,18 +47,18 @@ namespace ui {
 
         void run();
 
+    protected:
     private:
         NcursesWrapper _wrapper;
         NcursesManager _manager;
 
+        std::unique_ptr<IView> _currentView;
+        bool _running;
+
         std::vector<MenuOption> _menuOptions;
         int _selectedIndex;
-        bool _running;
-    
-        int _titleWin;
-        int _menuWin;
-        int _contentWin;
 
+        void switchView(ViewType type);
         void handleUserInput();
         void update();
     };
