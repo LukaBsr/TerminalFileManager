@@ -7,8 +7,22 @@
     #define NCURSESAPP_HPP
 
     #include "NcursesManager.hpp"
+    #include <functional>
 
 namespace ui {
+
+    /**
+     * @struct MenuOption
+     * @brief A structure that represents a menu option with a label and an action.
+     *
+     * This structure is used to define the options available in the menu, including
+     * the label to be displayed and the action to be executed when the option is selected.
+     */
+    
+    struct MenuOption {
+        std::string label;
+        std::function<void()> action;
+    };
 
     /**
      * @class NcursesApp
@@ -29,7 +43,13 @@ namespace ui {
         NcursesWrapper _wrapper;
         NcursesManager _manager;
 
+        std::vector<MenuOption> _menuOptions;
+        int _selectedIndex;
         bool _running;
+    
+        int _titleWin;
+        int _menuWin;
+        int _contentWin;
 
         void handleUserInput();
         void update();

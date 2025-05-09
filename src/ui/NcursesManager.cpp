@@ -16,9 +16,10 @@ namespace ui {
             _wrapper.destroyWindow(win);
     }
 
-    void NcursesManager::createWindow(int height, int width, int startY, int startX) {
+    int NcursesManager::createWindow(int height, int width, int startY, int startX) {
         _windows.push_back(_wrapper.createWindow(height, width, startY, startX));
-    }
+        return static_cast<int>(_windows.size()) - 1;
+    }    
 
     void NcursesManager::drawText(int winIndex, int y, int x, const std::string& text) {
         if (winIndex >= 0 && winIndex < static_cast<int>(_windows.size()))

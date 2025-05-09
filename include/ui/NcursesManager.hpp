@@ -26,7 +26,7 @@ namespace ui {
         NcursesManager(NcursesWrapper& wrapper);
         ~NcursesManager();
     
-        void createWindow(int height, int width, int startY, int startX);
+        int createWindow(int height, int width, int startY, int startX);
         void drawText(int winIndex, int y, int x, const std::string& text);
         void clearWindow(int winIndex);
         void refreshAll();

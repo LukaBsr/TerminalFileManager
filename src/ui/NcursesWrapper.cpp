@@ -19,7 +19,9 @@ namespace ui {
         initscr();
         cbreak();
         noecho();
+        keypad(stdscr, TRUE);
         curs_set(0);
+        timeout(100);
         refresh();
     }
 
