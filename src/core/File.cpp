@@ -36,7 +36,7 @@ namespace core {
         return _size; 
     }
 
-    bool File::getIsDirectory() const noexcept { 
+    bool File::isDirectory() const noexcept { 
         return _isDirectory; 
     }
 

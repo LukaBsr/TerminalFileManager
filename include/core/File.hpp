@@ -27,7 +27,7 @@ namespace core {
         const std::string& getName() const noexcept;
         const std::string& getPath() const noexcept;
         std::uintmax_t getSize() const noexcept;
-        bool getIsDirectory() const noexcept;
+        bool isDirectory() const noexcept;
         std::time_t getLastModified() const noexcept;
 
     protected:

@@ -6,8 +6,9 @@
 #ifndef FILEINFOVIEW_HPP
     #define FILEINFOVIEW_HPP
 
-    #include "IView.hpp"
     #include "ui/NcursesManager.hpp"
+    #include "core/File.hpp"
+    #include "IView.hpp"
     #include "ViewType.hpp"
 
     #include <functional>
@@ -22,7 +23,7 @@ namespace ui {
      */
     class FileInfoView : public IView {
     public:
-        FileInfoView(NcursesManager& manager, std::function<void(ViewType)> switchCallback);
+        FileInfoView(NcursesManager& manager, const core::File& file, std::function<void(ViewType)> switchCallback);
 
         void handleInput(int ch) override;
         void update() override;
@@ -31,6 +32,10 @@ namespace ui {
     private:
         NcursesManager& _manager;
         std::function<void(ViewType)> _switchCallback;
+        core::File _file;
+
+        std::string formatSize(std::uintmax_t size) const;
+        std::string formatTime(std::time_t time) const;
     };
 
 } // namespace ui

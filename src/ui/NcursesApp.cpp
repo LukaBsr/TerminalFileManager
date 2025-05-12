@@ -6,8 +6,11 @@
  */
 
 #include "ui/NcursesApp.hpp"
+#include <mutex>
 
 namespace ui {
+
+#include <mutex>
 
     /**
      * @brief Constructor for the NcursesApp class.
@@ -43,22 +46,26 @@ namespace ui {
      * @param type The type of view to switch to.
      */
     void NcursesApp::switchView(ViewType type) {
+        auto switchViewCallback = [this](ViewType next) {
+            this->switchView(next);
+        };
+
         switch (type) {
             case ViewType::MAIN_MENU:
-                _currentView = std::make_unique<MainMenuView>(_manager, [this](ViewType next) {
-                    this->switchView(next);
-                });
+                _currentView = std::make_unique<MainMenuView>(_manager, switchViewCallback);
                 break;
             case ViewType::EXPLORER:
-                _currentView = std::make_unique<ExplorerView>(_manager, [this](ViewType next) {
-                    this->switchView(next);
-                });
+                _currentView = std::make_unique<ExplorerView>(_manager, *this, switchViewCallback);
                 break;
-            case ViewType::FILE_INFO:
-                _currentView = std::make_unique<FileInfoView>(_manager, [this](ViewType next) {
-                    this->switchView(next);
-                });
+            case ViewType::FILE_INFO: {
+                const auto& file = _selectedFile;
+                if (!file) {
+                    _currentView = std::make_unique<MainMenuView>(_manager, switchViewCallback);
+                    return;
+                }
+                _currentView = std::make_unique<FileInfoView>(_manager, *file, switchViewCallback);
                 break;
+            }
             case ViewType::QUIT:
                 _running = false;
                 break;
@@ -82,5 +89,15 @@ namespace ui {
         if (_currentView)
             _currentView->update();
     }
+
+    /**
+     * @brief Sets the selected file.
+     * Transfers ownership of the provided file to the `_selectedFile` member.
+     * @param file The file to be set as selected.
+     */
+    void NcursesApp::setSelectedFile(std::shared_ptr<core::File> file) {
+        std::lock_guard<std::mutex> lock(_fileMutex);
+        _selectedFile = std::move(file);
+    } 
 
 } // namespace ui

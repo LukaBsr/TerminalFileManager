@@ -6,6 +6,8 @@
  */
 
 #include "ui/views/ExplorerView.hpp"
+#include "ui/NcursesApp.hpp"
+#include <memory>
 
 namespace ui {
 
@@ -15,10 +17,15 @@ namespace ui {
      * @param manager The NcursesManager instance to manage the UI.
      * @param switchCallback The callback function to switch views.
      */
-    ExplorerView::ExplorerView(NcursesManager& manager, std::function<void(ViewType)> switchCallback)
-        : _directory("."), _selectedIndex(0), _manager(manager), _switchCallback(switchCallback)
+    ExplorerView::ExplorerView(NcursesManager& manager, NcursesApp& parent, std::function<void(ViewType)> switchCallback)
+        : _directory("."), _selectedIndex(0), _manager(manager), _parent(parent), _switchCallback(switchCallback)
     {
-        _fileNames = _directory.listFiles();
+        try {
+            _fileNames = _directory.listFiles();
+        } catch (const std::exception& e) {
+            _fileNames.clear();
+            _manager.drawText(0, 0, 2, "Error: Unable to list files in the directory.");
+        }
     }
 
     /**
@@ -76,7 +83,8 @@ namespace ui {
             _fileNames = _directory.listFiles();
             _selectedIndex = 0;
         } else {
-            // Plus tard : afficher infos fichier
+            auto file = std::make_shared<core::File>(entry);
+            _parent.setSelectedFile(file);
             _switchCallback(ViewType::FILE_INFO);
         }
     }

@@ -15,6 +15,8 @@
 
 namespace ui {
 
+    class NcursesApp;
+    
     /**
      * @class ExplorerView
      * @brief A class that represents the explorer view in the application.
@@ -23,7 +25,7 @@ namespace ui {
      */
     class ExplorerView : public IView {
     public:
-        ExplorerView(NcursesManager& manager, std::function<void(ViewType)> switchCallback);
+        ExplorerView(NcursesManager& manager, NcursesApp& parent, std::function<void(ViewType)> switchCallback);
 
         void handleInput(int ch) override;
         void update() override;
@@ -35,6 +37,7 @@ namespace ui {
         int _selectedIndex;
 
         NcursesManager& _manager;
+        NcursesApp& _parent;
         std::function<void(ViewType)> _switchCallback;
 
         void enterSelected();
