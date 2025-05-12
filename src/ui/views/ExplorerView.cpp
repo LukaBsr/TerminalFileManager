@@ -11,12 +11,15 @@ namespace ui {
 
     /**
      * @brief Constructor for the ExplorerView class.
-     * Initializes the manager and switch callback.
+     * Initializes the directory, file names, selected index, and switch callback.
      * @param manager The NcursesManager instance to manage the UI.
      * @param switchCallback The callback function to switch views.
      */
     ExplorerView::ExplorerView(NcursesManager& manager, std::function<void(ViewType)> switchCallback)
-        : _manager(manager), _switchCallback(switchCallback) {}
+        : _directory("."), _selectedIndex(0), _manager(manager), _switchCallback(switchCallback)
+    {
+        _fileNames = _directory.listFiles();
+    }
 
     /**
      * @brief Handles user input for the ExplorerView.
@@ -24,8 +27,20 @@ namespace ui {
      * @param ch The input character.
      */
     void ExplorerView::handleInput(int ch) {
-        if (ch == 'b') {
-            _switchCallback(ViewType::MAIN_MENU);
+        switch (ch) {
+            case KEY_UP:
+                _selectedIndex = (_selectedIndex - 1 + _fileNames.size()) % _fileNames.size();
+                break;
+            case KEY_DOWN:
+                _selectedIndex = (_selectedIndex + 1) % _fileNames.size();
+                break;
+            case '\n':
+            case KEY_ENTER:
+                enterSelected();
+                break;
+            case 'q':
+                _switchCallback(ViewType::MAIN_MENU);
+                break;
         }
     }
 
@@ -35,10 +50,35 @@ namespace ui {
      */
     void ExplorerView::update() {
         _manager.clearWindow(0);
-        _manager.drawText(0, 1, 2, "[EXPLORER]");
-        _manager.drawText(0, 3, 2, "Contenu fictif à explorer...");
-        _manager.drawText(0, 5, 2, "Appuie sur 'b' pour revenir.");
+        _manager.drawText(0, 0, 2, "Explorateur de fichiers");
+        _manager.drawText(0, 1, 2, "========================");
+
+        for (std::size_t i = 0; i < _fileNames.size(); ++i) {
+            std::string display = (_selectedIndex == static_cast<int>(i) ? "> " : "  ") + _fileNames[i];
+            _manager.drawText(0, 3 + i, 2, display);
+        }
+
         _manager.refreshAll();
+    }
+
+    /**
+     * @brief Enters the selected file or directory.
+     * If the selected item is a directory, it updates the current directory and lists its files.
+     * If it's a file, it switches to the file information view.
+     */
+    void ExplorerView::enterSelected() {
+        const std::string& selectedName = _fileNames[_selectedIndex];
+        std::string newPath = _directory.getPath() + "/" + selectedName;
+
+        std::filesystem::directory_entry entry(newPath);
+        if (entry.is_directory()) {
+            _directory.setPath(newPath);
+            _fileNames = _directory.listFiles();
+            _selectedIndex = 0;
+        } else {
+            // Plus tard : afficher infos fichier
+            _switchCallback(ViewType::FILE_INFO);
+        }
     }
 
 } // namespace ui

@@ -6,8 +6,9 @@
 #ifndef EXPLORERVIEW_HPP
     #define EXPLORERVIEW_HPP
 
-    #include "IView.hpp"
     #include "ui/NcursesManager.hpp"
+    #include "core/Directory.hpp"
+    #include "IView.hpp"
     #include "ViewType.hpp"
 
     #include <functional>
@@ -29,8 +30,14 @@ namespace ui {
 
     protected:
     private:
+        core::Directory _directory;
+        std::vector<std::string> _fileNames;
+        int _selectedIndex;
+
         NcursesManager& _manager;
         std::function<void(ViewType)> _switchCallback;
+
+        void enterSelected();
     };
 
 } // namespace ui
