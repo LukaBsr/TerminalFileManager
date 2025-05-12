@@ -47,11 +47,16 @@ namespace ui {
 
         void run();
 
+        void setSelectedFile(std::shared_ptr<core::File> file);
+        std::shared_ptr<core::File> getSelectedFile() const;
+
     protected:
     private:
         NcursesWrapper _wrapper;
         NcursesManager _manager;
 
+        std::mutex _fileMutex;
+        std::shared_ptr<core::File> _selectedFile;
         std::unique_ptr<IView> _currentView;
         bool _running;
 
