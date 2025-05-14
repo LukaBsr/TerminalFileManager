@@ -36,4 +36,20 @@ namespace ui {
             _wrapper.refreshWindow(win);
     }
 
+    void NcursesManager::registerWindow(WindowRole role, WINDOW* window) {
+        _roleMap[role] = window;
+    }
+
+    WINDOW* NcursesManager::getWindow(WindowRole role) {
+        auto it = _roleMap.find(role);
+        return (it != _roleMap.end()) ? it->second : nullptr;
+    }
+    
+    WINDOW* NcursesManager::createAndRegisterWindow(WindowRole role, int height, int width, int startY, int startX) {
+        WINDOW* window = _wrapper.createWindow(height, width, startY, startX);
+        registerWindow(role, window);
+        _windows.push_back(window);
+        return window;
+    }
+
 } // namespace ui

@@ -22,6 +22,15 @@ namespace ui {
         keypad(stdscr, TRUE);
         curs_set(0);
         timeout(100);
+        start_color();
+        use_default_colors();
+        
+        init_pair(1, COLOR_WHITE, -1);     // Texte normal
+        init_pair(2, COLOR_CYAN, -1);      // Sidebar
+        init_pair(3, COLOR_GREEN, -1);     // Fichiers exécutables
+        init_pair(4, COLOR_MAGENTA, -1);   // Fichiers spéciaux
+        init_pair(5, COLOR_YELLOW, -1);    // Status bar
+        
         refresh();
     }
 

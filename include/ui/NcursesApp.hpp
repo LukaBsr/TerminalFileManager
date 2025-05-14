@@ -9,7 +9,7 @@
     #include "ui/NcursesManager.hpp"
     #include "views/ViewType.hpp"
     #include "views/IView.hpp"
-    #include "views/MainMenuView.hpp"
+    #include "views/SidebarView.hpp"
     #include "views/ExplorerView.hpp"
     #include "views/FileInfoView.hpp"
 
@@ -66,6 +66,7 @@ namespace ui {
         void switchView(ViewType type);
         void handleUserInput();
         void update();
+        void initLayout();
     };
 
 } // namespace ui
