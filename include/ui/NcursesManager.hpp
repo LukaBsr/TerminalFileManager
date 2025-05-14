@@ -9,8 +9,16 @@
     #include "NcursesWrapper.hpp"
 
     #include <vector>
+    #include <map>
 
 namespace ui {
+
+    enum class WindowRole {
+        SIDEBAR,
+        EXPLORER,
+        INFO,
+        STATUS
+    };
 
     /**
      * @class NcursesManager
@@ -30,10 +38,15 @@ namespace ui {
         void drawText(int winIndex, int y, int x, const std::string& text);
         void clearWindow(int winIndex);
         void refreshAll();
-    
+
+        void registerWindow(WindowRole role, WINDOW* window);
+        WINDOW* createAndRegisterWindow(WindowRole role, int height, int width, int startY, int startX);
+        WINDOW* getWindow(WindowRole role);
+
     private:
         NcursesWrapper& _wrapper;
         std::vector<WINDOW*> _windows;
+        std::map<WindowRole, WINDOW*> _roleMap;
     };
     
 } // namespace ui

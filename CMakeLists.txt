@@ -24,7 +24,7 @@ set(SOURCES
     src/ui/NcursesApp.cpp
     src/ui/views/ExplorerView.cpp
     src/ui/views/FileInfoView.cpp
-    src/ui/views/MainMenuView.cpp
+    src/ui/views/SidebarView.cpp
 )
 
 # Include directories

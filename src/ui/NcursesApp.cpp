@@ -18,7 +18,7 @@ namespace ui {
      */
     NcursesApp::NcursesApp() : _manager(_wrapper), _running(true) {
         _wrapper.init();
-        _manager.createWindow(20, 60, 1, 2);
+        initLayout();
         switchView(ViewType::MAIN_MENU);
     }
 
@@ -28,6 +28,25 @@ namespace ui {
      */
     NcursesApp::~NcursesApp() {
         _wrapper.end();
+    }
+
+    void NcursesApp::initLayout() {
+        int maxY, maxX;
+        getmaxyx(stdscr, maxY, maxX);
+
+        // Dimensions dynamiques (ajustables selon goût)
+        int sidebarWidth = maxX / 5;
+        int infoHeight = 5;
+        int statusHeight = 3;
+
+        int explorerWidth = maxX - sidebarWidth;
+        int explorerHeight = maxY - infoHeight - statusHeight;
+
+        // Création et enregistrement des fenêtres
+        _manager.createAndRegisterWindow(WindowRole::SIDEBAR, explorerHeight, sidebarWidth, 0, 0);
+        _manager.createAndRegisterWindow(WindowRole::EXPLORER, explorerHeight, explorerWidth, 0, sidebarWidth);
+        _manager.createAndRegisterWindow(WindowRole::INFO, infoHeight, maxX / 2, explorerHeight, 0);
+        _manager.createAndRegisterWindow(WindowRole::STATUS, statusHeight, maxX / 2, explorerHeight + infoHeight, maxX / 2);
     }
 
     /**
@@ -52,20 +71,18 @@ namespace ui {
 
         switch (type) {
             case ViewType::MAIN_MENU:
-                _currentView = std::make_unique<MainMenuView>(_manager, switchViewCallback);
+                _currentView = std::make_unique<SidebarView>(_manager, switchViewCallback);
                 break;
             case ViewType::EXPLORER:
                 _currentView = std::make_unique<ExplorerView>(_manager, *this, switchViewCallback);
                 break;
-            case ViewType::FILE_INFO: {
-                const auto& file = _selectedFile;
-                if (!file) {
-                    _currentView = std::make_unique<MainMenuView>(_manager, switchViewCallback);
+            case ViewType::FILE_INFO:
+                if (!_selectedFile) {
+                    _currentView = std::make_unique<SidebarView>(_manager, switchViewCallback);
                     return;
                 }
-                _currentView = std::make_unique<FileInfoView>(_manager, *file, switchViewCallback);
+                _currentView = std::make_unique<FileInfoView>(_manager, *_selectedFile, switchViewCallback);
                 break;
-            }
             case ViewType::QUIT:
                 _running = false;
                 break;
