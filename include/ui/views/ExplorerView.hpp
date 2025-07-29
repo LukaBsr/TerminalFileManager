@@ -41,6 +41,9 @@ namespace ui {
         std::function<void(ViewType)> _switchCallback;
 
         void enterSelected();
+        void createNewFile();
+        void createNewDirectory();
+        void deleteSelected();
     };
 
 } // namespace ui

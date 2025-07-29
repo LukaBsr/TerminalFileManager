@@ -41,20 +41,25 @@ namespace ui {
      * Clears the window, draws the text, and refreshes the UI.
      */
     void FileInfoView::update() {
-        _manager.clearWindow(0);
-
-        _manager.drawText(0, 0, 2, getLocalizedString("file_selected"));
-        _manager.drawText(0, 1, 2, "===================");
-
-        _manager.drawText(0, 3, 2, "Nom: " + _file.getName());
-        _manager.drawText(0, 4, 2, "Chemin: " + _file.getPath());
-        _manager.drawText(0, 5, 2, "Type: " + std::string(_file.isDirectory() ? "Dossier" : "Fichier"));
-        _manager.drawText(0, 6, 2, "Taille: " + formatSize(_file.getSize()));
-        _manager.drawText(0, 7, 2, "Modifié: " + formatTime(_file.getLastModified()));
-
-        _manager.drawText(0, 9, 2, "[Entrée] ou [q] pour retourner");
-
-        _manager.refreshAll();
+        WINDOW* win = _manager.getWindow(WindowRole::SIDEBAR);
+        auto& wrapper = _manager.getWrapper();
+    
+        wrapper.clearWindow(win);
+        box(win, 0, 0);
+        wrapper.drawTextInWindow(win, 0, 2, " Informations ");
+    
+        int max_y, max_x;
+        getmaxyx(win, max_y, max_x);
+    
+        wrapper.drawTextInWindow(win, 2, 2, "Nom: " + _file.getName());
+        wrapper.drawTextInWindow(win, 3, 2, "Chemin: " + _file.getPath());
+        wrapper.drawTextInWindow(win, 4, 2, "Type: " + std::string(_file.isDirectory() ? "Dossier" : "Fichier"));
+        wrapper.drawTextInWindow(win, 5, 2, "Taille: " + formatSize(_file.getSize()));
+        wrapper.drawTextInWindow(win, 6, 2, "Modifié: " + formatTime(_file.getLastModified()));
+    
+        wrapper.drawTextInWindow(win, max_y - 2, 2, "[Entrée] ou [q] pour retourner");
+    
+        wrapper.refreshWindow(win);
     }
 
     /**

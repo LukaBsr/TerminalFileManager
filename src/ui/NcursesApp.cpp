@@ -34,15 +34,13 @@ namespace ui {
         int maxY, maxX;
         getmaxyx(stdscr, maxY, maxX);
 
-        // Dimensions dynamiques (ajustables selon goût)
-        int sidebarWidth = maxX / 5;
+        int sidebarWidth = maxX / 2;
         int infoHeight = 5;
         int statusHeight = 3;
 
         int explorerWidth = maxX - sidebarWidth;
         int explorerHeight = maxY - infoHeight - statusHeight;
 
-        // Création et enregistrement des fenêtres
         _manager.createAndRegisterWindow(WindowRole::SIDEBAR, explorerHeight, sidebarWidth, 0, 0);
         _manager.createAndRegisterWindow(WindowRole::EXPLORER, explorerHeight, explorerWidth, 0, sidebarWidth);
         _manager.createAndRegisterWindow(WindowRole::INFO, infoHeight, maxX / 2, explorerHeight, 0);

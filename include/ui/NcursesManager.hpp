@@ -43,6 +43,8 @@ namespace ui {
         WINDOW* createAndRegisterWindow(WindowRole role, int height, int width, int startY, int startX);
         WINDOW* getWindow(WindowRole role);
 
+        NcursesWrapper& getWrapper() { return _wrapper; }
+
     private:
         NcursesWrapper& _wrapper;
         std::vector<WINDOW*> _windows;
