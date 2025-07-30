@@ -16,6 +16,8 @@
     #include <memory>
     #include <functional>
     #include <vector>
+    #include <string>
+    #include <mutex>
 
 namespace ui {
 

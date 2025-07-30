@@ -21,7 +21,7 @@ namespace ui {
         noecho();
         keypad(stdscr, TRUE);
         curs_set(0);
-        timeout(100);
+        halfdelay(10);
         start_color();
         use_default_colors();
         
@@ -29,6 +29,7 @@ namespace ui {
         init_pair(2, COLOR_WHITE, -1);
         init_pair(3, COLOR_GREEN, -1);
         init_pair(4, COLOR_CYAN, -1);
+        init_pair(5, COLOR_YELLOW, -1);
         
         refresh();
     }
