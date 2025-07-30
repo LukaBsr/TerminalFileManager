@@ -44,6 +44,10 @@ namespace ui {
         void createNewFile();
         void createNewDirectory();
         void deleteSelected();
+
+        void zipSelected();
+        void unzipSelected();
+    
     };
 
 } // namespace ui
