@@ -10,8 +10,7 @@
     #include "core/Directory.hpp"
     #include "IView.hpp"
     #include "ViewType.hpp"
-
-    #include <functional>
+    #include "FileActionHandler.hpp"
 
 namespace ui {
 
@@ -34,19 +33,17 @@ namespace ui {
     private:
         core::Directory _directory;
         std::vector<std::string> _fileNames;
+        std::optional<std::string> _copiedPath;
         int _selectedIndex;
 
         NcursesManager& _manager;
         NcursesApp& _parent;
+
+        std::unique_ptr<FileActionHandler> _actionHandler;
+        std::unique_ptr<ExplorerContext> _context;
         std::function<void(ViewType)> _switchCallback;
 
         void enterSelected();
-        void createNewFile();
-        void createNewDirectory();
-        void deleteSelected();
-
-        void zipSelected();
-        void unzipSelected();
     
     };
 

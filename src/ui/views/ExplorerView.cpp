@@ -14,217 +14,32 @@
 namespace ui {
 
     /**
-     * @brief Checks if a string ends with a given suffix.
-     * @param str The string to check.
-     * @param suffix The suffix to check for.
-     * @return True if str ends with suffix, false otherwise.
-     */
-    bool endsWith(const std::string& str, const std::string& suffix) {
-        return str.size() >= suffix.size() &&
-               str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
-    }
-
-    /**
-     * @brief Checks if a file name represents an archive.
-     * @param name The file name to check.
-     * @return True if the file name ends with a common archive extension, false otherwise.
-     */
-    bool isArchive(const std::string& name) {
-        return endsWith(name, ".zip") ||
-               endsWith(name, ".tar") ||
-               endsWith(name, ".gz")  ||
-               endsWith(name, ".rar");
-    }
-        
-
-    /**
      * @brief Constructor for the ExplorerView class.
-     * Initializes the directory, file names, selected index, and switch callback.
+     * Initializes the explorer view with the given manager, parent application, and switch callback.
      * @param manager The NcursesManager instance to manage the UI.
+     * @param parent The parent application instance.
      * @param switchCallback The callback function to switch views.
      */
     ExplorerView::ExplorerView(NcursesManager& manager, NcursesApp& parent, std::function<void(ViewType)> switchCallback)
         : _directory("."), _selectedIndex(0), _manager(manager), _parent(parent), _switchCallback(switchCallback)
     {
         try {
+            _context = std::make_unique<ExplorerContext>(ExplorerContext {
+                _manager,
+                _parent,
+                _directory,
+                _fileNames,
+                _selectedIndex,
+                _switchCallback,
+                _copiedPath
+            });
+            _actionHandler = std::make_unique<FileActionHandler>(*_context);
             _fileNames = _directory.listFiles();
         } catch (const std::exception& e) {
             _fileNames.clear();
             _manager.drawText(0, 0, 2, "Error: Unable to list files in the directory.");
         }
     }
-
-    /**
-     * @brief Creates a new file in the current directory.
-     * Prompts the user for a file name and creates the file if it does not already exist.
-     */
-    void ExplorerView::createNewFile() {
-        NcursesWrapper& wrapper = _manager.getWrapper();
-        int max_y, max_x;
-        getmaxyx(stdscr, max_y, max_x);
-    
-        int popup_h = 3;
-        int popup_w = 50;
-        int popup_y = (max_y - popup_h);
-        int popup_x = 0;
-    
-        WINDOW* inputWin = wrapper.createWindow(popup_h, popup_w, popup_y, popup_x);
-        box(inputWin, 0, 0);
-        wrapper.drawTextInWindow(inputWin, 1, 2, "Nom du fichier: ");
-        wrapper.refreshWindow(inputWin);
-    
-        char filename[256];
-        echo();
-        wgetnstr(inputWin, filename, 255);
-        noecho();
-    
-        wrapper.destroyWindow(inputWin);
-    
-        std::string fullPath = _directory.getPath() + "/" + filename;
-        if (std::filesystem::exists(fullPath)) {
-            wrapper.drawTextInWindow(_manager.getWindow(WindowRole::EXPLORER), 0, 0, "Fichier déjà existant !");
-            return;
-        }
-    
-        std::ofstream newFile(fullPath);
-        if (newFile) {
-            newFile.close();
-            wrapper.drawTextInWindow(_manager.getWindow(WindowRole::EXPLORER), 0, 0, "Fichier créé avec succès !");
-            _fileNames = _directory.listFiles();
-        } else {
-            wrapper.drawTextInWindow(_manager.getWindow(WindowRole::EXPLORER), 0, 0, "Erreur: création échouée");
-        }
-    
-        _switchCallback(ViewType::EXPLORER);
-    }    
-
-    /**
-     * @brief Creates a new directory in the current directory.
-     * Prompts the user for a directory name and creates the directory if it does not already exist.
-     */
-    void ExplorerView::createNewDirectory() {
-        NcursesWrapper& wrapper = _manager.getWrapper();
-        int max_y, max_x;
-        getmaxyx(stdscr, max_y, max_x);
-    
-        int popup_h = 3;
-        int popup_w = 50;
-        int popup_y = (max_y - popup_h);
-        int popup_x = 0;
-    
-        WINDOW* inputWin = wrapper.createWindow(popup_h, popup_w, popup_y, popup_x);
-        box(inputWin, 0, 0);
-        wrapper.drawTextInWindow(inputWin, 1, 2, "Nom du dossier: ");
-        wrapper.refreshWindow(inputWin);
-    
-        char dirname[256];
-        echo();
-        wgetnstr(inputWin, dirname, 255);
-        noecho();
-    
-        wrapper.destroyWindow(inputWin);
-    
-        std::string fullPath = _directory.getPath() + "/" + dirname;
-        if (std::filesystem::exists(fullPath)) {
-            wrapper.drawTextInWindow(_manager.getWindow(WindowRole::EXPLORER), 0, 0, "Dossier déjà existant !");
-            return;
-        }
-    
-        if (std::filesystem::create_directory(fullPath)) {
-            _fileNames = _directory.listFiles();
-        } else {
-            wrapper.drawTextInWindow(_manager.getWindow(WindowRole::EXPLORER), 0, 0, "Erreur: création échouée");
-        }
-    
-        _switchCallback(ViewType::EXPLORER);
-    }    
-
-    /**
-     * @brief Deletes the currently selected file or directory.
-     * If the selected item is a directory, it will be removed recursively.
-     * If it is a file, it will be removed directly.
-     */
-    void ExplorerView::deleteSelected() {
-        if (_fileNames.empty()) return;
-    
-        std::string name = _fileNames[_selectedIndex];
-        std::string fullPath = _directory.getPath() + "/" + name;
-    
-        NcursesWrapper& wrapper = _manager.getWrapper();
-    
-        try {
-            std::filesystem::directory_entry entry(fullPath);
-            if (entry.is_directory()) {
-                std::filesystem::remove_all(fullPath);
-            } else {
-                std::filesystem::remove(fullPath);
-            }
-    
-            _fileNames = _directory.listFiles();
-            if (_selectedIndex >= static_cast<int>(_fileNames.size())) {
-                _selectedIndex = std::max(0, static_cast<int>(_fileNames.size()) - 1);
-            }
-    
-            _switchCallback(ViewType::EXPLORER);
-        } catch (const std::exception& e) {
-            wrapper.drawTextInWindow(_manager.getWindow(WindowRole::EXPLORER), 0, 0, "Erreur: suppression échouée");
-        }
-    }
-
-    /**
-     * @brief Zips the currently selected file or directory.
-     * If the selected item is a directory, it will be zipped recursively.
-     * If it is a file, it will be zipped directly.
-     */
-    void ExplorerView::zipSelected() {
-        if (_fileNames.empty()) return;
-    
-        std::string target = _fileNames[_selectedIndex];
-        std::string fullPath = _directory.getPath() + "/" + target;
-        std::string zipName = _directory.getPath() + "/" + target + ".zip";
-    
-        std::string command = "zip -r \"" + zipName + "\" \"" + fullPath + "\"";
-        int result = system(command.c_str());
-    
-        if (result == 0) {
-            _manager.drawText(0, 0, 0, "Archive créée !");
-            _fileNames = _directory.listFiles();
-            update();
-        } else {
-            _manager.drawText(0, 0, 0, "Erreur lors du zip !");
-        }
-    
-        _switchCallback(ViewType::EXPLORER);
-    }
-
-    /**
-     * @brief Unzips the currently selected .zip file.
-     * If the selected item is not a .zip file, it displays an error message.
-     */
-    void ExplorerView::unzipSelected() {
-        if (_fileNames.empty()) return;
-    
-        std::string target = _fileNames[_selectedIndex];
-        if (!endsWith(target, ".zip")) {
-            _manager.drawText(0, 0, 0, "Pas une archive .zip !");
-            return;
-        }
-    
-        std::string fullPath = _directory.getPath() + "/" + target;
-        std::string command = "unzip -d \"" + _directory.getPath() + "/extracted_" + target.substr(0, target.size()-4) + "\" \"" + fullPath + "\"";
-    
-        int result = system(command.c_str());
-    
-        if (result == 0) {
-            _manager.drawText(0, 0, 0, "Décompression réussie !");
-            _fileNames = _directory.listFiles();
-            update();
-        } else {
-            _manager.drawText(0, 0, 0, "Erreur lors du unzip !");
-        }
-    
-        _switchCallback(ViewType::EXPLORER);
-    }    
 
     /**
      * @brief Handles user input for the ExplorerView.
@@ -247,19 +62,31 @@ namespace ui {
                 _switchCallback(ViewType::MAIN_MENU);
                 break;
             case 'n':
-                createNewFile();
+                _actionHandler->createNewFile();
                 break;
             case 'd':
-                createNewDirectory();
+                _actionHandler->createNewDirectory();
                 break;
             case 'x':
-                deleteSelected();
+                _actionHandler->deleteSelected();
                 break;
                 case 'z':
-                zipSelected();
+                _actionHandler->zipSelected();
                 break;
             case 'u':
-                unzipSelected();
+                _actionHandler->unzipSelected();
+                break;
+            case 'b':
+                _actionHandler->goBackToParent();
+                break;
+            case 'r':
+                _actionHandler->renameSelected();
+                break;
+            case 'c':
+                _actionHandler->copySelected();
+                break;
+            case 'v':
+                _actionHandler->pasteCopied();
                 break;            
         }
     }
@@ -292,7 +119,7 @@ namespace ui {
                     colorPair = 3;
                 } else if (entry.is_symlink()) {
                     colorPair = 4;
-                } else if (isArchive(name)) {
+                } else if (_actionHandler->isArchive(name)) {
                     colorPair = 5;
                 }
             } catch (...) {
@@ -308,9 +135,17 @@ namespace ui {
     
         int max_y, max_x;
         getmaxyx(win, max_y, max_x);
-        wrapper.drawTextInWindow(win, max_y - 4, 2, "[Entrée] Ouvrir  [q] Menu");
-        wrapper.drawTextInWindow(win, max_y - 3, 2, "[n] Nouveau  [d] Dossier  [x] Supprimer");
-        wrapper.drawTextInWindow(win, max_y - 2, 2, "[z] Zip  [u] Unzip");
+
+        wrapper.drawTextInWindow(win, max_y - 3, 2, "[Entrée] Ouvrir  [q] Menu");
+
+        std::string rightLine1 = "[x] Supprimer  [b] Retour  [r] Renommer";
+        int right1_x = max_x - static_cast<int>(rightLine1.length()) - 2;
+        wrapper.drawTextInWindow(win, max_y - 3, right1_x, rightLine1);
+
+        wrapper.drawTextInWindow(win, max_y - 2, 2, "[n] Nouveau fichier  [d] Nouveau dossier");
+        std::string rightLine2 = "[z] Zip  [u] Unzip [c] Copier  [v] Coller";
+        int right2_x = max_x - static_cast<int>(rightLine2.length()) - 2;
+        wrapper.drawTextInWindow(win, max_y - 2, right2_x, rightLine2);
     
         wrapper.refreshWindow(win);
     }    

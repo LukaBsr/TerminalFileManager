@@ -25,6 +25,7 @@ set(SOURCES
     src/ui/views/ExplorerView.cpp
     src/ui/views/FileInfoView.cpp
     src/ui/views/SidebarView.cpp
+    src/ui/views/FileActionHandler.cpp
 )
 
 # Include directories
